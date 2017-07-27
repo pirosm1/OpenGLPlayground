@@ -147,11 +147,14 @@
     <ClCompile Include="ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="animatedTriFragment.glsl" />
+    <None Include="animatedTriVector.glsl" />
     <None Include="rainbowPointFragment.glsl" />
     <None Include="rainbowPointVertex.glsl" />
     <None Include="triangleVector.glsl" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AnimatedTri.h" />
     <ClInclude Include="BaseRenderer.h" />
     <ClInclude Include="RainbowBuffer.h" />
     <ClInclude Include="RainbowPoint.h" />

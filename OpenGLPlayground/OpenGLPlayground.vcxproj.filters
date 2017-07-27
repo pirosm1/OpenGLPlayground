@@ -38,6 +38,12 @@
     <None Include="triangleVector.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="animatedTriVector.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="animatedTriFragment.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseRenderer.h">
@@ -56,6 +62,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RainbowPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimatedTri.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -160,6 +160,7 @@
     <ClInclude Include="RainbowPoint.h" />
     <ClInclude Include="RedBuffer.h" />
     <ClInclude Include="ResourceManager.h" />
+    <ClInclude Include="TessellatedTri.h" />
     <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

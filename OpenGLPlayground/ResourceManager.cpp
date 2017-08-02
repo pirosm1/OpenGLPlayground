@@ -11,9 +11,11 @@ GLuint mkp::ResourceManager::createShaderProgram(const char *vertex_file_path,
     int infoLogLength;
 
     // Attempt to create and load vertex shader
-    GLuint vertexShaderID = loadVertexShader(vertex_file_path, result, infoLogLength);
+    GLuint vertexShaderID =
+    loadShader(vertex_file_path, result, infoLogLength, GL_VERTEX_SHADER);
     // Attempt to create and load fragment shader
-    GLuint fragmentShaderID = loadFragmentShader(fragment_file_path, result, infoLogLength);
+    GLuint fragmentShaderID =
+    loadShader(fragment_file_path, result, infoLogLength, GL_FRAGMENT_SHADER);
 
     // if loading the vertex or fragment failed, error out
     if (!vertexShaderID || !fragmentShaderID) {
@@ -52,56 +54,38 @@ GLuint mkp::ResourceManager::createShaderProgram(const char *vertex_file_path,
     return programID;
 }
 
-GLuint mkp::ResourceManager::loadVertexShader(const char *vertex_file_path,
-                                              GLint &result,
-                                              int &infoLogLength) {
+GLuint mkp::ResourceManager::loadShader(const char *vertex_file_path,
+                                        GLint &result,
+                                        int &info_log_length,
+                                        const GLenum shader_type) {
     // Create string for vertex shader code
-    std::string *vertexShaderCode = new std::string();
+    std::string *shaderCode = new std::string();
 
     // Read in Vertex shader code, on failure error out
-    if (!readShaderFile(vertex_file_path, vertexShaderCode)) {
+    if (!readShaderFile(vertex_file_path, shaderCode)) {
         fprintf(stderr, "Failed to read %s.\n", vertex_file_path);
         return 0;
     };
 
-    // create the Vertex shader
-    GLuint vertexShaderID = glCreateShader(GL_VERTEX_SHADER);
+    // create the shader
+    GLuint shaderID = glCreateShader(shader_type);
+
+    if (!shaderID) {
+        fprintf(stderr,
+                "Failed to create shader. Invalid shader type provided.\n");
+
+        glDeleteShader(shaderID);
+    }
 
     // Attempt to compile the vertex shader
-    if (!compileShader(vertexShaderID, *vertexShaderCode, result, infoLogLength)) {
+    if (!compileShader(shaderID, *shaderCode, result, info_log_length)) {
         fprintf(stderr, "Failed to compile %s.\n", vertex_file_path);
 
-        glDeleteShader(vertexShaderID);
+        glDeleteShader(shaderID);
         return 0;
     }
 
-    return vertexShaderID;
-}
-
-GLuint mkp::ResourceManager::loadFragmentShader(const char *fragment_file_path,
-                                                GLint &result,
-                                                int &infoLogLength) {
-    // Create string for fragment shader code
-    std::string *fragmentShaderCode = new std::string();
-
-    // Read in fragment shader code, on failure error out
-    if (!readShaderFile(fragment_file_path, fragmentShaderCode)) {
-        fprintf(stderr, "Failed to read %s.\n", fragment_file_path);
-        return 0;
-    };
-
-    // create the fragment shader
-    GLuint fragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // Attempt to compile the fragment shader
-    if (!compileShader(fragmentShaderID, *fragmentShaderCode, result, infoLogLength)) {
-        fprintf(stderr, "Failed to compile %s.\n", fragment_file_path);
-
-        glDeleteShader(fragmentShaderID);
-        return 0;
-    }
-
-    return fragmentShaderID;
+    return shaderID;
 }
 
 int mkp::ResourceManager::readShaderFile(const char *file_path, std::string *output) {
@@ -126,17 +110,17 @@ int mkp::ResourceManager::readShaderFile(const char *file_path, std::string *out
 int mkp::ResourceManager::compileShader(GLuint shader_id,
                                         const std::string shader_code,
                                         GLint &result,
-                                        int &infoLogLength) {
+                                        int &info_log_length) {
     const char *shaderSourcePointer = shader_code.c_str();
     glShaderSource(shader_id, 1, &shaderSourcePointer, NULL);
     glCompileShader(shader_id);
 
     // Check shader
     glGetShaderiv(shader_id, GL_COMPILE_STATUS, &result);
-    glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &infoLogLength);
-    if (infoLogLength > 0) {
-        std::vector<char> shaderErrorMessage(infoLogLength + 1);
-        glGetShaderInfoLog(shader_id, infoLogLength, NULL, &shaderErrorMessage[0]);
+    glGetShaderiv(shader_id, GL_INFO_LOG_LENGTH, &info_log_length);
+    if (info_log_length > 0) {
+        std::vector<char> shaderErrorMessage(info_log_length + 1);
+        glGetShaderInfoLog(shader_id, info_log_length, NULL, &shaderErrorMessage[0]);
         fprintf(stderr, "%s\n", &shaderErrorMessage[0]);
 
         return 0;

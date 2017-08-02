@@ -67,5 +67,8 @@
     <ClInclude Include="AnimatedTri.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TessellatedTri.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

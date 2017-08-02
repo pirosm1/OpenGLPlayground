@@ -9,8 +9,7 @@ public:
     ResourceManager();
 
     GLuint createShaderProgram(const char *, const char *);
-    GLuint loadVertexShader(const char *, GLint &, int &);
-    GLuint loadFragmentShader(const char *, GLint &, int &);
+    GLuint loadShader(const char *, GLint &, int &, const GLenum);
 
 private:
     int readShaderFile(const char *, std::string *);

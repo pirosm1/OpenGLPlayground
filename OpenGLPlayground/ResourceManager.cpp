@@ -5,32 +5,50 @@
 
 mkp::ResourceManager::ResourceManager() {}
 
-GLuint mkp::ResourceManager::createShaderProgram(const char *vertex_file_path,
-                                                 const char *fragment_file_path) {
+GLuint mkp::ResourceManager::createShaderProgram(const std::vector<ShaderInfo> shaders) {
     GLint result = GL_FALSE;
     int infoLogLength;
 
-    // Attempt to create and load vertex shader
-    GLuint vertexShaderID =
-    loadShader(vertex_file_path, result, infoLogLength, GL_VERTEX_SHADER);
-    // Attempt to create and load fragment shader
-    GLuint fragmentShaderID =
-    loadShader(fragment_file_path, result, infoLogLength, GL_FRAGMENT_SHADER);
-
-    // if loading the vertex or fragment failed, error out
-    if (!vertexShaderID || !fragmentShaderID) {
-        glDeleteShader(vertexShaderID);
-        glDeleteShader(fragmentShaderID);
-
+    if (shaders.empty()) {
+        fprintf(stderr, "No shaders supplied to createShaderProgram.\n");
         return 0;
+    }
+
+    std::vector<GLuint> shaderIdArr(shaders.size(), 0);
+    for (int i = 0, l = shaders.size(); i < l; ++i) {
+        // Attempt to create and load vertex shader
+        GLuint shaderId =
+        loadShader(shaders[i].path, result, infoLogLength, shaders[i].type);
+
+        if (!shaderId) {
+            fprintf(stderr, "Failed to create shader program.\n");
+
+            break;
+        }
+
+        shaderIdArr[i] = shaderId;
+    }
+
+    for (GLuint &s : shaderIdArr) {
+        if (!s) {
+            for (auto &s2 : shaderIdArr) {
+                glDeleteShader(s2);
+            }
+
+            return 0;
+        }
     }
 
     // create shader program
     GLuint programID = glCreateProgram();
 
-    // Attempt to attach link program to shaders
-    glAttachShader(programID, vertexShaderID);
-    glAttachShader(programID, fragmentShaderID);
+    // Attempt to attach shaders
+    for (auto &s : shaderIdArr) {
+        fprintf(stdout, "%d\n", s);
+        glAttachShader(programID, s);
+    }
+
+    // Link the program to shaders
     glLinkProgram(programID);
 
     // Check program
@@ -42,11 +60,13 @@ GLuint mkp::ResourceManager::createShaderProgram(const char *vertex_file_path,
         glGetProgramInfoLog(programID, infoLogLength, NULL, &programErrorMessage[0]);
         fprintf(stderr, "%s\n", &programErrorMessage[0]);
 
-        glDetachShader(programID, vertexShaderID);
-        glDetachShader(programID, fragmentShaderID);
-        glDeleteShader(vertexShaderID);
-        glDeleteShader(fragmentShaderID);
+        for (auto &s : shaderIdArr) {
+            glDetachShader(programID, s);
+            glDeleteShader(s);
+        }
+
         glDeleteProgram(programID);
+        ;
 
         return 0;
     }
@@ -75,6 +95,7 @@ GLuint mkp::ResourceManager::loadShader(const char *vertex_file_path,
                 "Failed to create shader. Invalid shader type provided.\n");
 
         glDeleteShader(shaderID);
+        return 0;
     }
 
     // Attempt to compile the vertex shader

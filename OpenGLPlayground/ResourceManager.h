@@ -4,11 +4,16 @@
 #include <GL\glew.h>
 
 namespace mkp {
+struct ShaderInfo {
+    const char *path;
+    GLenum type;
+};
+
 class ResourceManager {
 public:
     ResourceManager();
 
-    GLuint createShaderProgram(const char *, const char *);
+    GLuint createShaderProgram(const std::vector<ShaderInfo>);
     GLuint loadShader(const char *, GLint &, int &, const GLenum);
 
 private:

@@ -1,7 +1,12 @@
 #pragma once
 #define _USE_MATH_DEFINES
+
+#include <vector>
+
 #include "BaseRenderer.h"
 #include "ResourceManager.h"
+
+struct ShaderInfo;
 
 namespace mkp {
 class AnimatedTriangle : public BaseRenderer {
@@ -10,8 +15,10 @@ public:
 
     void startup() final {
         ResourceManager resMan;
-        programID = resMan.createShaderProgram("animatedTriVector.glsl",
-                                               "animatedTriFragment.glsl");
+        std::vector<ShaderInfo> shaders = { { "animatedTriVector.glsl", GL_VERTEX_SHADER },
+                                            { "animatedTriFragment.glsl", GL_FRAGMENT_SHADER } };
+        programID = resMan.createShaderProgram(shaders);
+
         glCreateVertexArrays(1, &vertexArrayObject);
         glBindVertexArray(vertexArrayObject);
     }

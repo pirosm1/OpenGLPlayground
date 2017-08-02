@@ -11,8 +11,9 @@ public:
 
     void startup() final {
         ResourceManager resMan;
-        programID = resMan.createShaderProgram("triangleVector.glsl",
-                                               "rainbowPointFragment.glsl");
+        std::vector<ShaderInfo> shaders = { { "triangleVector.glsl", GL_VERTEX_SHADER },
+                                            { "rainbowPointFragment.glsl", GL_FRAGMENT_SHADER } };
+        programID = resMan.createShaderProgram(shaders);
         glCreateVertexArrays(1, &vertexArrayObject);
         glBindVertexArray(vertexArrayObject);
     }
